@@ -3,4 +3,3 @@ streamlit-vtkjs>=0.3.2
 ladybug-pandas>=0.4.0
 ladybug-charts>=1.18.8
 streamlit>=1.22.0
-pandas<2.2.0
