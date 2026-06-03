@@ -14,6 +14,10 @@ def _patched_date_range(*args, **kwargs):
     return _orig_date_range(*args, **kwargs)
 pd.date_range = _patched_date_range
 
+# applymap was removed in pandas 2.2+ (renamed to map)
+if not hasattr(pd.DataFrame, 'applymap'):
+    pd.DataFrame.applymap = pd.DataFrame.map
+
 from ladybug.epw import EPW
 
 from helper import colorsets, get_fields, get_hourly_data_figure, \
