@@ -3,6 +3,17 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+# ladybug-charts uses deprecated pandas freq aliases (eg. "H") removed in pandas 2.2+.
+# Patch pd.date_range so old aliases are silently mapped to their new names.
+_orig_date_range = pd.date_range
+_freq_alias_map = {'H': 'h', 'T': 'min', 'S': 's', 'L': 'ms', 'U': 'us', 'N': 'ns',
+                   'M': 'ME', 'Q': 'QE', 'A': 'YE', 'Y': 'YE'}
+def _patched_date_range(*args, **kwargs):
+    if 'freq' in kwargs and isinstance(kwargs['freq'], str):
+        kwargs['freq'] = _freq_alias_map.get(kwargs['freq'], kwargs['freq'])
+    return _orig_date_range(*args, **kwargs)
+pd.date_range = _patched_date_range
+
 from ladybug.epw import EPW
 
 from helper import colorsets, get_fields, get_hourly_data_figure, \
