@@ -200,7 +200,7 @@ def get_bar_chart_figure(fields: dict, epw: EPW, selection: List[str], data_type
     data = []
     for count, item in enumerate(selection):
         if item:
-            var = epw._get_data_by_field(fields[list(fields.keys())[count]])
+            var = epw.get_data_by_field(fields[list(fields.keys())[count]])
             if data_type == 'Monthly average':
                 data.append(var.average_monthly())
             elif data_type == 'Monthly total':

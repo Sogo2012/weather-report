@@ -61,7 +61,7 @@ def main():
         with st.expander('Hourly data'):
             hourly_selected = st.selectbox(
                 'Select an environmental variable', options=fields.keys(), key='hourly_data')
-            hourly_data = global_epw._get_data_by_field(fields[hourly_selected])
+            hourly_data = global_epw.get_data_by_field(fields[hourly_selected])
             hourly_data_conditional_statement = st.text_input(
                 'Apply conditional statement')
             hourly_data_min = st.text_input('Min')
@@ -106,7 +106,7 @@ def main():
             hourly_line_chart_selected = st.selectbox(
                 'Select an environmental variable', options=fields.keys(), index=2,
                 key='line_chart')
-            hourly_line_chart_data = global_epw._get_data_by_field(
+            hourly_line_chart_data = global_epw.get_data_by_field(
                 fields[hourly_line_chart_selected])
 
             hourly_line_chart_switch = st.checkbox('Switch colors', key='line_chart_switch',
@@ -118,7 +118,7 @@ def main():
             diurnal_average_chart_hourly_selected = st.selectbox(
                 'Select an environmental variable', options=fields.keys(), index=8,
                 key='hourly_diurnal_average_chart')
-            diurnal_average_chart_hourly_data = global_epw._get_data_by_field(
+            diurnal_average_chart_hourly_data = global_epw.get_data_by_field(
                 fields[diurnal_average_chart_hourly_selected])
 
             diurnal_average_chart_hourly_switch = st.checkbox(
@@ -131,7 +131,7 @@ def main():
             daily_chart_selected = st.selectbox(
                 'Select an environmental variable', options=fields.keys(), index=16,
                 key='daily_chart')
-            daily_chart_data = global_epw._get_data_by_field(
+            daily_chart_data = global_epw.get_data_by_field(
                 fields[daily_chart_selected])
 
             daily_chart_switch = st.checkbox('Switch colors', key='daily_chart_switch',
@@ -153,7 +153,7 @@ def main():
             else:
                 sunpath_selected = st.selectbox(
                     'Select an environmental variable', options=fields.keys(), key='sunpath')
-                sunpath_data = global_epw._get_data_by_field(fields[sunpath_selected])
+                sunpath_data = global_epw.get_data_by_field(fields[sunpath_selected])
                 sunpath_switch = None
 
         # Degree days ###################################################################
@@ -197,7 +197,7 @@ def main():
                     'Select an environmental variable',
                     options=fields.keys(), key='psychrometric'
                 )
-                psy_data = global_epw._get_data_by_field(fields[psy_selected])
+                psy_data = global_epw.get_data_by_field(fields[psy_selected])
             else:
                 psy_data = None
 
