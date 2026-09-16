@@ -52,6 +52,45 @@ colorsets = {
     'view_study': Colorset.view_study()
 }
 
+# Etiquetas en español para las variables del EPW. Las claves (en inglés) son
+# las que usa la librería ladybug internamente y no deben traducirse, ya que
+# se usan para buscar el número de campo correspondiente en el archivo EPW.
+FIELD_LABELS_ES = {
+    'Dry Bulb Temperature': 'Temperatura de bulbo seco',
+    'Dew Point Temperature': 'Temperatura de punto de rocío',
+    'Relative Humidity': 'Humedad relativa',
+    'Atmospheric Station Pressure': 'Presión atmosférica de estación',
+    'Extraterrestrial Horizontal Radiation': 'Radiación horizontal extraterrestre',
+    'Extraterrestrial Direct Normal Radiation': 'Radiación normal directa extraterrestre',
+    'Horizontal Infrared Radiation Intensity': 'Intensidad de radiación infrarroja horizontal',
+    'Global Horizontal Radiation': 'Radiación horizontal global',
+    'Direct Normal Radiation': 'Radiación normal directa',
+    'Diffuse Horizontal Radiation': 'Radiación horizontal difusa',
+    'Global Horizontal Illuminance': 'Iluminancia horizontal global',
+    'Direct Normal Illuminance': 'Iluminancia normal directa',
+    'Diffuse Horizontal Illuminance': 'Iluminancia horizontal difusa',
+    'Zenith Luminance': 'Luminancia del cenit',
+    'Wind Direction': 'Dirección del viento',
+    'Wind Speed': 'Velocidad del viento',
+    'Total Sky Cover': 'Cobertura total de nubes',
+    'Opaque Sky Cover': 'Cobertura de nubes opacas',
+    'Visibility': 'Visibilidad',
+    'Ceiling Height': 'Altura del techo de nubes',
+    'Present Weather Observation': 'Observación del tiempo presente',
+    'Present Weather Codes': 'Códigos del tiempo presente',
+    'Precipitable Water': 'Agua precipitable',
+    'Aerosol Optical Depth': 'Espesor óptico de aerosoles',
+    'Snow Depth': 'Profundidad de nieve',
+    'Days Since Last Snowfall': 'Días desde la última nevada',
+    'Albedo': 'Albedo',
+    'Liquid Precipitation Depth': 'Profundidad de precipitación líquida',
+}
+
+
+def field_label(english_name: str) -> str:
+    """Translate an EPW field name to Spanish for display, if available."""
+    return FIELD_LABELS_ES.get(english_name, english_name)
+
 
 def epw_hash_func(epw: EPW) -> str:
     """Function to help streamlit hash an EPW object."""
@@ -118,7 +157,7 @@ def get_diurnal_average_chart_figure(epw: EPW, global_colorset: str, switch: boo
         A plotly figure.
     """
     colors = get_colors(switch, global_colorset)
-    return epw.diurnal_average_chart(show_title=True, colors=colors)
+    return epw.diurnal_average_chart(title='Promedio Diurno', show_title=True, colors=colors)
 
 
 def get_hourly_data_figure(
@@ -151,21 +190,21 @@ def get_hourly_data_figure(
             data = data.filter_by_conditional_statement(
                 conditional_statement)
         except AssertionError:
-            return 'No values found for that conditional statement'
+            return 'No se encontraron valores para esa declaración condicional'
         except ValueError:
-            return 'Invalid conditional statement'
+            return 'Declaración condicional inválida'
 
     if min:
         try:
             min = float(min)
         except ValueError:
-            return 'Invalid minimum value'
+            return 'Valor mínimo inválido'
 
     if max:
         try:
             max = float(max)
         except ValueError:
-            return 'Invalid maximum value'
+            return 'Valor máximo inválido'
 
     lb_lp = LegendParameters(colors=colorsets[global_colorset])
 
@@ -176,7 +215,7 @@ def get_hourly_data_figure(
 
     hourly_plot = HourlyPlot(data, legend_parameters=lb_lp)
 
-    return hourly_plot.plot(title=str(data.header.data_type), show_title=True)
+    return hourly_plot.plot(title=field_label(str(data.header.data_type)), show_title=True)
 
 
 def get_bar_chart_figure(fields: dict, epw: EPW, selection: List[str], data_type: str,
@@ -201,13 +240,13 @@ def get_bar_chart_figure(fields: dict, epw: EPW, selection: List[str], data_type
     for count, item in enumerate(selection):
         if item:
             var = epw.get_data_by_field(fields[list(fields.keys())[count]])
-            if data_type == 'Monthly average':
+            if data_type == 'Promedio mensual':
                 data.append(var.average_monthly())
-            elif data_type == 'Monthly total':
+            elif data_type == 'Total mensual':
                 data.append(var.total_monthly())
-            elif data_type == 'Daily average':
+            elif data_type == 'Promedio diario':
                 data.append(var.average_daily())
-            elif data_type == 'Daily total':
+            elif data_type == 'Total diario':
                 data.append(var.total_daily())
 
     lb_lp = LegendParameters(colors=colors)
@@ -231,7 +270,7 @@ def get_hourly_line_chart_figure(data: HourlyContinuousCollection,
     """
     colors = get_colors(switch, global_colorset)
     return data.line_chart(
-        color=colors[-1], title=data.header.data_type.name, show_title=True
+        color=colors[-1], title=field_label(data.header.data_type.name), show_title=True
     )
 
 
@@ -249,7 +288,7 @@ def get_hourly_diurnal_average_chart_figure(data: HourlyContinuousCollection,
     """
     colors = get_colors(switch, global_colorset)
     return data.diurnal_average_chart(
-        title=data.header.data_type.name, show_title=True,
+        title=field_label(data.header.data_type.name), show_title=True,
         color=colors[-1])
 
 
@@ -268,7 +307,7 @@ def get_daily_chart_figure(data: HourlyContinuousCollection, switch: bool,
     colors = get_colors(switch, global_colorset)
     data = data.average_daily()
 
-    return data.bar_chart(color=colors[-1], title=data.header.data_type.name,
+    return data.bar_chart(color=colors[-1], title=field_label(data.header.data_type.name),
                           show_title=True)
 
 
@@ -288,7 +327,7 @@ def get_sunpath_figure(sunpath_type: str, global_colorset: str, epw: EPW = None,
     Returns:
         A plotly figure.
     """
-    if sunpath_type == 'from epw location':
+    if sunpath_type == 'desde la ubicación del EPW':
         lb_sunpath = Sunpath.from_location(epw.location)
         colors = get_colors(switch, global_colorset)
         title = epw.location.city
@@ -296,7 +335,7 @@ def get_sunpath_figure(sunpath_type: str, global_colorset: str, epw: EPW = None,
     else:
         lb_sunpath = Sunpath.from_location(epw.location)
         colors = colorsets[global_colorset]
-        title = data.header.data_type.name
+        title = field_label(data.header.data_type.name)
         return lb_sunpath.plot(colorset=colors, data=data, title=title, show_title=True)
 
 
@@ -342,7 +381,7 @@ def get_degree_days_figure(
         [hourly_cool.total_monthly(), hourly_heat.total_monthly()],
         legend_parameters=lb_lp, stack=stack)
 
-    return monthly_chart.plot(title='Degree Days', center_title=True), hourly_heat, hourly_cool
+    return monthly_chart.plot(title='Grados-Día', center_title=True), hourly_heat, hourly_cool
 
 
 def get_windrose_figure(st_month: int, st_day: int, st_hour: int, end_month: int,
@@ -371,7 +410,7 @@ def get_windrose_figure(st_month: int, st_day: int, st_hour: int, end_month: int
     lb_wind_rose = WindRose(wind_dir, wind_spd)
     lb_wind_rose.legend_parameters = lb_lp
 
-    return lb_wind_rose.plot(title='Wind-Rose', show_title=True)
+    return lb_wind_rose.plot(title='Rosa de Vientos', show_title=True)
 
 
 def get_psy_chart_figure(epw: EPW, global_colorset: str, selected_strategy: str,
@@ -395,21 +434,21 @@ def get_psy_chart_figure(epw: EPW, global_colorset: str, selected_strategy: str,
     lb_psy = PsychrometricChart(epw.dry_bulb_temperature,
                                 epw.relative_humidity, legend_parameters=lb_lp)
 
-    if selected_strategy == 'All':
+    if selected_strategy == 'Todas':
         strategies = [Strategy.comfort, Strategy.evaporative_cooling,
                       Strategy.mas_night_ventilation, Strategy.occupant_use_of_fans,
                       Strategy.capture_internal_heat, Strategy.passive_solar_heating]
-    elif selected_strategy == 'Comfort':
+    elif selected_strategy == 'Confort':
         strategies = [Strategy.comfort]
-    elif selected_strategy == 'Evaporative Cooling':
+    elif selected_strategy == 'Enfriamiento evaporativo':
         strategies = [Strategy.evaporative_cooling]
-    elif selected_strategy == 'Mass + Night Ventilation':
+    elif selected_strategy == 'Masa + ventilación nocturna':
         strategies = [Strategy.mas_night_ventilation]
-    elif selected_strategy == 'Occupant use of fans':
+    elif selected_strategy == 'Uso de ventiladores':
         strategies = [Strategy.occupant_use_of_fans]
-    elif selected_strategy == 'Capture internal heat':
+    elif selected_strategy == 'Captura de calor interno':
         strategies = [Strategy.capture_internal_heat]
-    elif selected_strategy == 'Passive solar heating':
+    elif selected_strategy == 'Calefacción solar pasiva':
         strategies = [Strategy.passive_solar_heating]
 
     pmv = PolygonPMV(lb_psy)

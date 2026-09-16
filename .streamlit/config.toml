@@ -3,3 +3,10 @@ gatherUsageStats = false
 
 [runner]
 fastReruns = true
+
+# Colores corporativos de ECO Consultor (manual de marca: Pantone 575 C y 309 C).
+[theme]
+primaryColor = "#66913E"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F2F1"
+textColor = "#173D4A"
