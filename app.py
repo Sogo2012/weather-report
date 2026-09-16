@@ -34,7 +34,7 @@ st.set_page_config(
 st.sidebar.image(
     'https://uploads-ssl.webflow.com/6035339e9bb6445b8e5f77d7/6397a0e7b8237e2d67af741a'
     '_pollination_brandmark-p-500.png',
-    use_column_width=True
+    use_container_width=True
 )
 
 
